@@ -17,6 +17,14 @@ private:
     public:
     Tensor ( const std :: vector < size_t >& shape , const std :: vector < double >& values );
 
+    ~Tensor();
+
+    static Tensor zeros ( size_t size );
+    static Tensor ones ( size_t size );
+    static Tensor random ( size_t size , double min , double max );
+    static Tensor arange (double start , double end );
+
+    void print() const;
 
 
 }
