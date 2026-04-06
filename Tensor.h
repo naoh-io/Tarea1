@@ -31,6 +31,8 @@ private:
     static Tensor arange (double start , double end );
 
     void print() const;
+
+
 };
 
 

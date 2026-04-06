@@ -1,7 +1,7 @@
 # Tarea1
 Programming III ; 2026-1 
 
-### Clase Tensor
+### 3. Clase Tensor
 Al inicio se creó la clase "Tensor.h" en el cual se definieron los constructores y destructores, así como una versión base de los métodos pero que luego se corrigió.
 
 Luego se implementó el constructor y destructor respectivamente. Luego en el main se implementaron también los métodos de la clase Tensor (ones, zeros, random y arange).
@@ -34,3 +34,22 @@ Tensor c = Tensor::arange(-3, 3);
 ```
 
 Una limitancia que se debe mencionar es que funciona con enteros, no podríamos incluir por ejemplo un Tensor::arange(0, 5.5)
+
+### 4. Gestión de Memoria y Ciclo de Vida
+
+Se implementaron los 5 métodos especiales:
+
+- **Destructor (`~Tensor`)**: Libera la memoria con `delete[]` para evitar fugas.
+
+- **Constructor de Copia**: Realiza deep copy, reservando nueva memoria y copiando todos los valores.
+
+- **Asignador de Copia (`operator=`)**: Libera memoria actual, luego copia los nuevos datos. Incluye verificación de auto-asignación.
+
+- **Constructor de Movimiento**: Transfiere la propiedad del puntero, dejando el origen en `nullptr`. Es `noexcept` para optimizaciones.
+
+- **Asignador de Movimiento**: Similar al constructor de movimiento, pero aplicado a un objeto existente.
+
+Estos métodos garantizan que no haya fugas de memoria, dobles liberaciones, y permiten operaciones eficientes sin copias innecesarias.
+
+
+

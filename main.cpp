@@ -85,7 +85,7 @@ Tensor Tensor::ones(const std::vector<size_t>& shape) {
         total_size *= dim;
     }
 
-    std::vector<double> values(total_size, 1.0);
+    vector<double> values(total_size, 1.0);
     return Tensor(shape, values);
 }
 
@@ -101,7 +101,7 @@ Tensor Tensor::random(const std::vector<size_t>& shape, double min, double max) 
         total_size *= dim;
     }
 
-    std::vector<double> values(total_size);
+    vector<double> values(total_size);
     for (size_t i = 0; i < total_size; i++) {
         double r = (double)rand()/RAND_MAX;
         values[i] = min+r*(max-min);
@@ -111,15 +111,31 @@ Tensor Tensor::random(const std::vector<size_t>& shape, double min, double max) 
 
 Tensor Tensor::arange(double start, double end) {
     size_t size = static_cast<size_t> (end-start);
-    std::vector<double> values(size);
+    vector<double> values(size);
     for (size_t i = 0; i < size; i++) {
         values[i] = start + i;
     }
     return Tensor({size}, values);
 }
 
+void Tensor::print() const { //pero solo sirve para 1D
+    cout << "[";
+    for (size_t i = 0; i < total_size; i++) {
+        cout << data[i];
+        if (i < total_size - 1) cout << ", ";
+    }
+    cout << "]" << endl;
+}
 
-int main(){
+int main() {
+    Tensor a = Tensor::arange(0, 6);
+    Tensor b = a;
+    Tensor c = std::move(a);
 
+    Tensor d = Tensor::zeros({2, 3});
+    d = b;
+
+    Tensor e = Tensor::ones({2, 2});
+    e = move(d);
     return 0;
 }
