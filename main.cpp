@@ -3,6 +3,8 @@
 #include <cmath>
 using namespace std;
 
+//Polimorfismo---------------
+
 class TensorTransform {
 public:
     virtual Tensor apply(const Tensor& t) const = 0;
@@ -44,6 +46,8 @@ Tensor Sigmoid::apply(const Tensor& t) const {
 
     return Tensor(t.getShape(), values);
 }
+
+//Metodos------------------------------
 
 Tensor::Tensor(const std::vector<size_t>& shape, const std::vector<double>&values) : shape(shape) {
     total_size = 1;
@@ -161,6 +165,8 @@ Tensor Tensor::arange(double start, double end) {
     return Tensor({size}, values);
 }
 
+//funcion para imprimir ----------------
+
 void Tensor::print() const {
     cout << "[";
     for (size_t i = 0; i < total_size; i++) {
@@ -233,15 +239,11 @@ int main() {
     Tensor F = A * 2.0;
     Tensor H = (A + B) * 2.0;
     A.print();
-    ReLU relu;
-    Tensor B = A.apply(relu);
-    std::cout << "despues de ReLU: ";
     B.print();
-    Sigmoid sigmoid;
-    Tensor C = A.apply(sigmoid);
-    std::cout << "despues de Sigmoid: ";
     C.print();
-    ReLU relu2;
-    Tensor D = A.apply(relu2).apply(sigmoid);
+    D.print();
+    E.print();
+    F.print();
+    H.print();
     return 0;
 }

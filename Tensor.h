@@ -37,6 +37,11 @@ private:
     static Tensor random(const std::vector<size_t>& shape, double min, double max);
     static Tensor arange (double start , double end );
 
+    Tensor operator+(const Tensor& other) const;
+    Tensor operator-(const Tensor& other) const;
+    Tensor operator*(const Tensor& other) const;
+    Tensor operator*(double scalar) const;
+
     void print() const;
 };
 
