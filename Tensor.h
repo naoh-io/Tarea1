@@ -19,9 +19,9 @@ private:
 
     ~Tensor();
 
-    static Tensor zeros ( size_t size );
-    static Tensor ones ( size_t size );
-    static Tensor random ( size_t size , double min , double max );
+    static Tensor zeros(const std::vector<size_t>& shape);
+    static Tensor ones(const std::vector<size_t>& shape);
+    static Tensor random(const std::vector<size_t>& shape, double min, double max);
     static Tensor arange (double start , double end );
 
     void print() const;
