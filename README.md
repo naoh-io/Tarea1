@@ -220,3 +220,51 @@ E.print();
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ```
 
+## 9. Funciones amigas: dot y matmul
+
+Se implementaron dos funciones amigas para operaciones algebraicas avanzadas, que pueden acceder directamente a la memoria interna de los tensores.
+
+###  Producto punto (dot)
+
+Calcula el producto punto entre dos vectores (tensores 1D).
+
+```cpp
+friend Tensor dot(const Tensor& a, const Tensor& b);
+```
+
+## Validaciones realizadas
+- Ambos tensores deben ser 1D
+- Deben tener la misma longitud
+
+### Multiplicación matricial (matmul)
+Realiza la multiplicación de dos matrices (tensores 2D).
+
+```cpp
+friend Tensor matmul(const Tensor& a, const Tensor& b);
+```
+
+## Validaciones:
+- Ambos tensores deben ser 1D
+- Deben tener la misma longitud
+
+## Ejemplos de ejecución (ambos):
+```cpp
+Tensor v = Tensor::arange(1, 5); // [1,2,3,4]
+Tensor w = Tensor::arange(5, 9); // [5,6,7,8]
+Tensor dp = dot(v, w);               // 1*5+2*6+3*7+4*8 = 70
+dp.print();
+
+    // Multiplicación matricial
+    Tensor M1 = Tensor::random({3, 4}, -1, 1); // 3×4
+    Tensor M2 = Tensor::random({4, 5}, -1, 1); // 4×5
+    Tensor M3 = matmul(M1, M2); // 3×5
+    M3.print();
+```
+Resultados:
+```cpp
+[70]
+[-0.0345116, -1.46236, 0.435877, -0.431674, 0.245255, -0.104995, -0.580882, -0.0983935, 0.30619, -0.284899, 0.446759, -0
+.486285, -0.409464, -0.895415, 0.432224]
+```
+Estas funciones son importantes para la implementación de redes neuronales que haremos a continuación.
+

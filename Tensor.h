@@ -49,6 +49,9 @@ private:
 
     static Tensor concat(const std::vector<Tensor>& tensors, size_t dim);
 
+    friend Tensor dot(const Tensor& a, const Tensor& b);
+    friend Tensor matmul(const Tensor& a, const Tensor& b);
+
 
     void print() const;
 };

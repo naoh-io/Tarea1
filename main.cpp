@@ -326,6 +326,52 @@ Tensor Tensor::concat(const std::vector<Tensor>& tensor, size_t dim) {
     return Tensor(new_shape, values);
 }
 
+//funciones amigas permitidas ----------
+Tensor dot(const Tensor& a, const Tensor& b) {
+    if (a.shape.size() != 1 || b.shape.size() != 1) {
+        throw runtime_error("dot solo funciona con tensores 1D");
+    }
+    if (a.total_size != b.total_size) {
+        throw runtime_error("Los vectores deben tener la misma longitud");
+    }
+    double resultado = 0.0;
+    for (size_t i = 0; i < a.total_size; i++) {
+        resultado += a.data[i] * b.data[i];
+    }
+    return Tensor({1}, {resultado});
+}
+
+Tensor matmul(const Tensor& a, const Tensor& b) {
+    if (a.shape.size() != 2 || b.shape.size() != 2) {
+        throw runtime_error("matmul solo funciona con tensores 2D");
+    }
+
+    size_t a_rows = a.shape[0];
+    size_t a_cols = a.shape[1];
+    size_t b_rows = b.shape[0];
+    size_t b_cols = b.shape[1];
+
+    if (a_cols != b_rows) {
+        throw runtime_error("Dimensiones incompatibles para matmul (A.cols != B.rows)");
+    }
+    vector<double> resultado_values(a_rows * b_cols, 0.0);
+    for (size_t i = 0; i < a_rows; i++) {
+        for (size_t j = 0; j < b_cols; j++) {
+            double sum = 0.0;
+            for (size_t k = 0; k < a_cols; k++) {
+                size_t a_idx = i * a_cols + k;
+                size_t b_idx = k * b_cols + j;
+                sum += a.data[a_idx] * b.data[b_idx];
+            }
+            size_t resultado_idx = i * b_cols + j;
+            resultado_values[resultado_idx] = sum;
+        }
+    }
+    return Tensor({a_rows, b_cols}, resultado_values);
+}
+
+
+
 int main() {
     //Tensor A = Tensor::arange(2, 5);
     //std::cout << "original: ";
@@ -362,13 +408,25 @@ int main() {
     //Tensor D = A.unsqueeze(0);
     //Tensor E = B.unsqueeze(1);
     //Tensor F = B.unsqueeze(2);
-    Tensor A = Tensor::ones({2, 3});
-    Tensor B = Tensor::zeros({2, 3});
-    Tensor C = Tensor::concat({A, B}, 0);
-    Tensor D = Tensor::concat({A, B}, 1);
-    Tensor E = Tensor::concat({A, A, B, B}, 0);
-    C.print();
-    D.print();
-    E.print();
+    //Tensor A = Tensor::ones({2, 3});
+    //Tensor B = Tensor::zeros({2, 3});
+    //Tensor C = Tensor::concat({A, B}, 0);
+    //Tensor D = Tensor::concat({A, B}, 1);
+    //Tensor E = Tensor::concat({A, A, B, B}, 0);
+    //C.print();
+    //D.print();
+    //E.print();
+    // Producto punto
+    //Tensor v = Tensor::arange(1, 5); // [1,2,3,4]
+    //Tensor w = Tensor::arange(5, 9); // [5,6,7,8]
+    //Tensor dp = dot(v, w);               // 1*5+2*6+3*7+4*8 = 70
+    //dp.print();
+
+    // Multiplicación matricial
+    //Tensor M1 = Tensor::random({3, 4}, -1, 1); // 3×4
+    //Tensor M2 = Tensor::random({4, 5}, -1, 1); // 4×5
+    //Tensor M3 = matmul(M1, M2); // 3×5
+    //M3.print();
     return 0;
 }
+
