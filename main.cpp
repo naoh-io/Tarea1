@@ -23,6 +23,53 @@ Tensor::~Tensor() {
     delete[] data;
 }
 
+//copia
+Tensor::Tensor(const Tensor& other)
+    : shape(other.shape), total_size(other.total_size) {
+    data = new double[total_size];
+    for (size_t i = 0; i < total_size; i++) {
+        data[i] = other.data[i];
+    }
+}
+
+//asignador copia
+Tensor& Tensor::operator=(const Tensor& other) {
+    if (this == &other) return *this;
+
+    delete[] data;
+    shape = other.shape;
+    total_size = other.total_size;
+    data = new double[total_size];
+    for (size_t i = 0; i < total_size; i++) {
+        data[i] = other.data[i];
+    }
+    return *this;
+}
+
+//c. mov
+Tensor::Tensor(Tensor&& other) noexcept
+    : data(other.data),
+      shape(std::move(other.shape)),
+      total_size(other.total_size) {
+    other.data = nullptr;
+    other.total_size = 0;
+}
+
+//a. mov
+Tensor& Tensor::operator=(Tensor&& other) noexcept {
+    if (this == &other) return *this;
+
+    delete[] data;
+    data = other.data;
+    shape = std::move(other.shape);
+    total_size = other.total_size;
+
+    other.data = nullptr;
+    other.total_size = 0;
+
+    return *this;
+}
+
 Tensor Tensor::zeros(const std::vector<size_t>& shape) {
     size_t total_size = 1;
     for (size_t dim : shape) {
