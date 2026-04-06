@@ -15,6 +15,7 @@ private:
     double* data;
     std::vector<size_t> shape;
     size_t total_size;
+    bool d_data;
     public:
     Tensor ( const std :: vector < size_t >& shape , const std :: vector < double >& values );
 
@@ -41,6 +42,11 @@ private:
     Tensor operator-(const Tensor& other) const;
     Tensor operator*(const Tensor& other) const;
     Tensor operator*(double scalar) const;
+
+    Tensor view(const std::vector<size_t>& new_shape) const;
+    Tensor unsqueeze(size_t dim) const;
+    Tensor(const std::vector<size_t>& shape, double* shared_data, size_t size);
+
 
     void print() const;
 };

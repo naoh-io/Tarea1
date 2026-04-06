@@ -67,12 +67,14 @@ Tensor::Tensor(const std::vector<size_t>& shape, const std::vector<double>&value
 }
 
 Tensor::~Tensor() {
-    delete[] data;
+    if (d_data) {
+        delete[] data;
+    }
 }
 
 //copia
 Tensor::Tensor(const Tensor& other)
-    : shape(other.shape), total_size(other.total_size) {
+    : shape(other.shape), total_size(other.total_size), d_data(true) {
     data = new double[total_size];
     for (size_t i = 0; i < total_size; i++) {
         data[i] = other.data[i];
@@ -97,9 +99,10 @@ Tensor& Tensor::operator=(const Tensor& other) {
 Tensor::Tensor(Tensor&& other) noexcept
     : data(other.data),
       shape(std::move(other.shape)),
-      total_size(other.total_size) {
+      total_size(other.total_size), d_data(other.d_data) {
     other.data = nullptr;
     other.total_size = 0;
+    other.d_data = false;
 }
 
 //a. mov
@@ -218,8 +221,55 @@ Tensor Tensor::operator*(double scalar) const {
     return Tensor(shape, result_values);
 }
 
+// Metodos view y unsqueeze --------------
+Tensor::Tensor(const std::vector<size_t>& shape, double* shared_data, size_t size)
+    : shape(shape), total_size(size), data(shared_data), d_data(false) {
+    size_t check_size = 1;
+    for (size_t dim : shape) {
+        check_size *= dim;
+    }
+    if (check_size != size) {
+        throw runtime_error("dimensiones incompatibles en constructor de vista");
+    }
+}
+
+Tensor Tensor::view(const std::vector<size_t>& new_shape) const {
+    size_t new_total_size = 1;
+    for (size_t dim : new_shape) {
+        new_total_size *= dim;
+    }
+    if (new_total_size != total_size) {
+        throw std::runtime_error("view() requiere el mismo número de elementos");
+    }
+    if (new_shape.size() > 3) {
+        throw std::runtime_error("view() es máximo 3 dimensiones");
+    }
+    return Tensor(new_shape, data, total_size);
+}
+
+Tensor Tensor::unsqueeze(size_t dim) const {
+    if (dim > shape.size()) {
+        throw runtime_error("posición inválida para unsqueeze");
+    }
+    if (shape.size() + 1 > 3) {
+        throw runtime_error("unsqueeze daría más de 3 dimensiones");
+    }
+    vector<size_t> new_shape;
+    for (size_t i = 0; i < shape.size(); i++) {
+        if (i == dim) {
+            new_shape.push_back(1);
+        }
+        new_shape.push_back(shape[i]);
+    }
+    if (dim == shape.size()) {
+        new_shape.push_back(1);
+    }
+    return Tensor(new_shape, data, total_size);
+}
+
+
 int main() {
-    Tensor A = Tensor::arange(2, 5);
+    //Tensor A = Tensor::arange(2, 5);
     //std::cout << "original: ";
     //A.print();
     //ReLU relu;
@@ -232,18 +282,27 @@ int main() {
     //C.print();
     //ReLU relu2;
     //Tensor D = A.apply(relu2).apply(sigmoid);
-    Tensor B = Tensor::ones({3});
-    Tensor C = A + B;
-    Tensor D = A - B;
-    Tensor E = A * B;
-    Tensor F = A * 2.0;
-    Tensor H = (A + B) * 2.0;
+    //Tensor B = Tensor::ones({3});
+    //Tensor C = A + B;
+    //Tensor D = A - B;
+    //Tensor E = A * B;
+    //Tensor F = A * 2.0;
+    //Tensor H = (A + B) * 2.0;
+    //A.print();
+    //B.print();
+    //C.print();
+    //D.print();
+    //E.print();
+    //F.print();
+    //H.print();
+    Tensor A = Tensor::arange(0, 12);
     A.print();
+    Tensor B = A.view({3, 4});
     B.print();
+    Tensor C = A.view({2, 2, 3});
     C.print();
-    D.print();
-    E.print();
-    F.print();
-    H.print();
+    Tensor D = A.unsqueeze(0);
+    Tensor E = B.unsqueeze(1);
+    Tensor F = B.unsqueeze(2);
     return 0;
 }

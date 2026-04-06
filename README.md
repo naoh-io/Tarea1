@@ -150,3 +150,35 @@ Resultado:
 
 ## 7. Modificación de dimensiones
 
+Aquí se implementa dos métodos que permitan cambiar la forma de un tensor sin copiar los datos, esto lo hacemos con view() y unsqueeze().
+Generamos la variable **`d_data`**, esta variable en realidad es "dueño_data", servirá para saber si el tensor es dueño de la memoria, hacemos esto porque si lo hacemos de forma tradicional haríamos un deep copy, pero no es lo que se busca.
+También modificamos el destructor para que libere memoria si d_data es true, o sea, dueño de los datos.
+
+El método **view()** permite reinterpretar la forma de un tensor sin modificar los datos subyacentes. Solo cambia la organización lógica de las dimensiones.
+
+El método **unsqueeze()** agrega una dimensión de tamaño 1 en la posición especificada. Esto es útil para preparar tensores para operaciones matriciales.
+
+Ejemplos de ejecución:
+```cpp
+int main() {
+    Tensor A = Tensor::arange(0, 12);
+    A.print();
+    Tensor B = A.view({3, 4});
+    B.print();
+    Tensor C = A.view({2, 2, 3});
+    C.print();
+    Tensor D = A.unsqueeze(0);
+    Tensor E = B.unsqueeze(1);
+    Tensor F = B.unsqueeze(2);
+    return 0;
+}
+```
+Resultado obtenido:
+```cpp
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+```
+
+
+
