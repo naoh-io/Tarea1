@@ -49,7 +49,7 @@ Tensor Sigmoid::apply(const Tensor& t) const {
 
 //Metodos------------------------------
 
-Tensor::Tensor(const std::vector<size_t>& shape, const std::vector<double>&values) : shape(shape) {
+Tensor::Tensor(const vector<size_t>& shape, const vector<double>&values) : shape(shape) {
     total_size = 1;
     for (size_t dim : shape) {
         total_size *= dim;
@@ -98,7 +98,7 @@ Tensor& Tensor::operator=(const Tensor& other) {
 //c. mov
 Tensor::Tensor(Tensor&& other) noexcept
     : data(other.data),
-      shape(std::move(other.shape)),
+      shape(move(other.shape)),
       total_size(other.total_size), d_data(other.d_data) {
     other.data = nullptr;
     other.total_size = 0;
@@ -111,7 +111,7 @@ Tensor& Tensor::operator=(Tensor&& other) noexcept {
 
     delete[] data;
     data = other.data;
-    shape = std::move(other.shape);
+    shape = move(other.shape);
     total_size = other.total_size;
 
     other.data = nullptr;
@@ -120,16 +120,16 @@ Tensor& Tensor::operator=(Tensor&& other) noexcept {
     return *this;
 }
 
-Tensor Tensor::zeros(const std::vector<size_t>& shape) {
+Tensor Tensor::zeros(const vector<size_t>& shape) {
     size_t total_size = 1;
     for (size_t dim : shape) {
         total_size *= dim;
     }
-    std::vector<double> values(total_size, 0.0);
+    vector<double> values(total_size, 0.0);
     return Tensor(shape, values);
 }
 
-Tensor Tensor::ones(const std::vector<size_t>& shape) {
+Tensor Tensor::ones(const vector<size_t>& shape) {
     size_t total_size = 1;
     for (size_t dim : shape) {
         total_size *= dim;
@@ -139,7 +139,7 @@ Tensor Tensor::ones(const std::vector<size_t>& shape) {
     return Tensor(shape, values);
 }
 
-Tensor Tensor::random(const std::vector<size_t>& shape, double min, double max) {
+Tensor Tensor::random(const vector<size_t>& shape, double min, double max) {
     static bool seeded = false;
     if (!seeded) {
         srand(time(nullptr));
@@ -181,14 +181,27 @@ void Tensor::print() const {
 
 //Sobrecarga--------------------
 Tensor Tensor::operator+(const Tensor& other) const {
-    if (shape != other.shape) {
-        throw runtime_error("las dimensiones son incompatibles para realizar la suma");
+    if (shape == other.shape) {
+        vector<double> resultado_values(total_size);
+        for (size_t i = 0; i < total_size; i++) {
+            resultado_values[i] = data[i] + other.data[i];
+        }
+        return Tensor(shape, resultado_values);
     }
-    vector<double> result_values(total_size);
-    for (size_t i = 0; i < total_size; i++) {
-        result_values[i] = data[i] + other.data[i];
-    }
-    return Tensor(shape, result_values);
+
+    if (shape.size() == 2 && other.shape.size() == 2 &&
+        other.shape[0] == 1 && shape[1] == other.shape[1]) {
+
+        vector<double> resultado_values(total_size);
+        for (size_t i = 0; i < shape[0]; i++) {
+            for (size_t j = 0; j < shape[1]; j++) {
+                resultado_values[i * shape[1] + j] = data[i * shape[1] + j] + other.data[j];
+            }
+        }
+        return Tensor(shape, resultado_values);
+        }
+
+    throw std::runtime_error("Dimensiones incompatibles para suma");
 }
 
 Tensor Tensor::operator-(const Tensor& other) const {
@@ -222,7 +235,7 @@ Tensor Tensor::operator*(double scalar) const {
 }
 
 // Metodos view y unsqueeze --------------
-Tensor::Tensor(const std::vector<size_t>& shape, double* shared_data, size_t size)
+Tensor::Tensor(const vector<size_t>& shape, double* shared_data, size_t size)
     : shape(shape), total_size(size), data(shared_data), d_data(false) {
     size_t check_size = 1;
     for (size_t dim : shape) {
@@ -233,16 +246,16 @@ Tensor::Tensor(const std::vector<size_t>& shape, double* shared_data, size_t siz
     }
 }
 
-Tensor Tensor::view(const std::vector<size_t>& new_shape) const {
+Tensor Tensor::view(const vector<size_t>& new_shape) const {
     size_t new_total_size = 1;
     for (size_t dim : new_shape) {
         new_total_size *= dim;
     }
     if (new_total_size != total_size) {
-        throw std::runtime_error("view() requiere el mismo número de elementos");
+        throw runtime_error("view() requiere el mismo número de elementos");
     }
     if (new_shape.size() > 3) {
-        throw std::runtime_error("view() es máximo 3 dimensiones");
+        throw runtime_error("view() es máximo 3 dimensiones");
     }
     return Tensor(new_shape, data, total_size);
 }
@@ -268,7 +281,7 @@ Tensor Tensor::unsqueeze(size_t dim) const {
 }
 
 // Concatenacion-------------------
-Tensor Tensor::concat(const std::vector<Tensor>& tensor, size_t dim) {
+Tensor Tensor::concat(const vector<Tensor>& tensor, size_t dim) {
     if (tensor.empty()) {
         throw runtime_error("No hay tensores");
     }
@@ -342,7 +355,7 @@ Tensor dot(const Tensor& a, const Tensor& b) {
 }
 
 Tensor matmul(const Tensor& a, const Tensor& b) {
-    if (a.shape.size() != 2 || b.shape.size() != 2) {
+    if (a.getShape().size() != 2 || b.getShape().size() != 2) {
         throw runtime_error("matmul solo funciona con tensores 2D");
     }
 
@@ -370,19 +383,27 @@ Tensor matmul(const Tensor& a, const Tensor& b) {
     return Tensor({a_rows, b_cols}, resultado_values);
 }
 
+//Redes Neuronales -------------- (ver el main)
+void print_shape(const Tensor& t, const string& name) {
+    cout << name << " shape: [";
+    for (size_t d : t.getShape()) {
+        cout << d << " ";
+    }
+    cout << "]" << endl;
+}
 
 
 int main() {
     //Tensor A = Tensor::arange(2, 5);
-    //std::cout << "original: ";
+    //cout << "original: ";
     //A.print();
     //ReLU relu;
     //Tensor B = A.apply(relu);
-    //std::cout << "despues de ReLU: ";
+    //cout << "despues de ReLU: ";
     //B.print();
     //Sigmoid sigmoid;
     //Tensor C = A.apply(sigmoid);
-    //std::cout << "despues de Sigmoid: ";
+    //cout << "despues de Sigmoid: ";
     //C.print();
     //ReLU relu2;
     //Tensor D = A.apply(relu2).apply(sigmoid);
@@ -427,6 +448,81 @@ int main() {
     //Tensor M2 = Tensor::random({4, 5}, -1, 1); // 4×5
     //Tensor M3 = matmul(M1, M2); // 3×5
     //M3.print();
+    cout << "     RED NEURONAL CON TENSOR++          " << endl;
+    try {
+        // ===== PASO 1: Entrada =====
+        cout << "\n[Paso 1] Creando tensor de entrada..." << endl;
+        Tensor X = Tensor::random({1000, 20, 20}, 0.0, 1.0);
+        print_shape(X, "X");
+
+        // ===== PASO 2: View =====
+        cout << "\n[Paso 2] Aplanando..." << endl;
+        Tensor X_flat = X.view({1000, 400});
+        print_shape(X_flat, "X_flat");
+
+        // ===== PASO 3: Primera multiplicación =====
+        cout << "\n[Paso 3] Primera capa lineal..." << endl;
+        Tensor W1 = Tensor::random({400, 100}, -0.1, 0.1);
+        print_shape(W1, "W1");
+
+        Tensor Z1 = matmul(X_flat, W1);
+        print_shape(Z1, "Z1 = X_flat × W1");
+
+        // ===== PASO 4: Sumar bias =====
+        cout << "\n[Paso 4] Sumando bias..." << endl;
+        Tensor b1 = Tensor::random({1, 100}, -0.1, 0.1);
+        print_shape(b1, "b1");
+
+        Tensor A1 = Z1 + b1;
+        print_shape(A1, "A1 = Z1 + b1");
+
+        // ===== PASO 5: ReLU =====
+        cout << "\n[Paso 5] Aplicando ReLU..." << endl;
+        ReLU relu;
+        Tensor H1 = A1.apply(relu);
+        print_shape(H1, "H1 = ReLU(A1)");
+
+        // ===== PASO 6: Segunda multiplicación =====
+        cout << "\n[Paso 6] Segunda capa lineal..." << endl;
+        Tensor W2 = Tensor::random({100, 10}, -0.1, 0.1);
+        print_shape(W2, "W2");
+
+        Tensor Z2 = matmul(H1, W2);
+        print_shape(Z2, "Z2 = H1 × W2");
+
+        // ===== PASO 7: Sumar bias =====
+        cout << "\n[Paso 7] Sumando bias..." << endl;
+        Tensor b2 = Tensor::random({1, 10}, -0.1, 0.1);
+        print_shape(b2, "b2");
+
+        Tensor A2 = Z2 + b2;
+        print_shape(A2, "A2 = Z2 + b2");
+
+        // ===== PASO 8: Sigmoid =====
+        cout << "\n[Paso 8] Aplicando Sigmoid..." << endl;
+        Sigmoid sigmoid;
+        Tensor Y = A2.apply(sigmoid);
+        print_shape(Y, "Y = Sigmoid(A2)");
+
+        // ===== RESULTADO FINAL =====
+        cout << "    ¡RED NEURONAL COMPLETADA CON EXITO!   " << endl;
+
+        cout << "\nShape final del tensor de salida: [";
+        for (size_t d : Y.getShape()) {
+            cout << d << " ";
+        }
+        cout << "]" << endl;
+        cout << "Total de parametros entrenables: "
+                  << 400*100 + 100 + 100*10 + 10 << endl;
+        cout << "  - W1: " << 400*100 << endl;
+        cout << "  - b1: " << 100 << endl;
+        cout << "  - W2: " << 100*10 << endl;
+        cout << "  - b2: " << 10 << endl;
+
+    } catch (const exception& e) {
+        cerr << "\nError: " << e.what() << endl;
+        return 1;
+    }
     return 0;
 }
 

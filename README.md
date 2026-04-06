@@ -11,7 +11,7 @@ Se hizo un proceso donde se generaba con el rand(), se convertía el número a d
 
 Respecto al método arange, primero se definía cuantos números tendríamos, eso se logra con la resta entre end y start. Luego se crea un vector para "size" elementos y se llena el vector con valores consecutivos. Trabaja similar a python con np.arange
 
-```{c++}
+```c++
 // Ejemplo 1
 Tensor a = Tensor::arange(0, 5);
 // size = 5-0 = 5
@@ -67,25 +67,25 @@ Recibe una referencia a `TensorTransform` y devuelve un nuevo tensor con la tran
 
 ### Ejemplo:
 
-```cpp
+```c++
 ReLU relu;
 Tensor B = A.apply(relu);
 ```
 
 Eso aplica ReLU a cada elemento. Igualmente pondré un ejemplo de ejecución:
 
-```cpp
+```c++
 int main() {
     Tensor A = Tensor::arange(-5, 5);
-    std::cout << "original: ";
+    cout << "original: ";
     A.print();
     ReLU relu;
     Tensor B = A.apply(relu);
-    std::cout << "despues de ReLU: ";
+    cout << "despues de ReLU: ";
     B.print();
     Sigmoid sigmoid;
     Tensor C = A.apply(sigmoid);
-    std::cout << "despues de Sigmoid: ";
+    cout << "despues de Sigmoid: ";
     C.print();
     ReLU relu2;
     Tensor D = A.apply(relu2).apply(sigmoid);
@@ -94,7 +94,7 @@ int main() {
 ```
 
 Lo que se obtuvo en la ejecución:
-```cpp
+```c++
 original: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
 despues de ReLU: [0, 0, 0, 0, 0, 0, 1, 2, 3, 4]
 despues de Sigmoid: [0.00669285, 0.0179862, 0.0474259, 0.119203, 0.268941, 0.5, 0.731059, 0.880797, 0.952574, 0.982014]
@@ -118,7 +118,7 @@ Se utiliza el runtime_error porque cuando utilicé el cout convencional el progr
 
 ### Ejemplo:
 
-```cpp
+```c++
 int main(){
     Tensor A = Tensor::arange(2, 5);
     Tensor B = Tensor::ones({3});
@@ -138,7 +138,7 @@ int main(){
 }
 ```
 Resultado:
-```cpp
+```c++
 [2, 3, 4]
 [1, 1, 1]
 [3, 4, 5]
@@ -159,7 +159,7 @@ El método **view()** permite reinterpretar la forma de un tensor sin modificar 
 El método **unsqueeze()** agrega una dimensión de tamaño 1 en la posición especificada. Esto es útil para preparar tensores para operaciones matriciales.
 
 Ejemplos de ejecución:
-```cpp
+```c++
 int main() {
     Tensor A = Tensor::arange(0, 12);
     A.print();
@@ -174,7 +174,7 @@ int main() {
 }
 ```
 Resultado obtenido:
-```cpp
+```c++
 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -187,7 +187,7 @@ Se implementó el método estático `concat()` para unir múltiples tensores a l
 
 ### Método concat
 
-```cpp
+```c++
 static Tensor concat(const std::vector<Tensor>& tensors, size_t dim);
 ```
 
@@ -201,7 +201,7 @@ static Tensor concat(const std::vector<Tensor>& tensors, size_t dim);
 
 ### Ejemplos de ejecución:
 
-```cpp
+```c++
 Tensor A = Tensor::ones({2, 3});
 Tensor B = Tensor::zeros({2, 3});
 Tensor C = Tensor::concat({A, B}, 0);
@@ -228,7 +228,7 @@ Se implementaron dos funciones amigas para operaciones algebraicas avanzadas, qu
 
 Calcula el producto punto entre dos vectores (tensores 1D).
 
-```cpp
+```c++
 friend Tensor dot(const Tensor& a, const Tensor& b);
 ```
 
@@ -239,7 +239,7 @@ friend Tensor dot(const Tensor& a, const Tensor& b);
 ### Multiplicación matricial (matmul)
 Realiza la multiplicación de dos matrices (tensores 2D).
 
-```cpp
+```c++
 friend Tensor matmul(const Tensor& a, const Tensor& b);
 ```
 
@@ -248,7 +248,7 @@ friend Tensor matmul(const Tensor& a, const Tensor& b);
 - Deben tener la misma longitud
 
 ## Ejemplos de ejecución (ambos):
-```cpp
+```c++
 Tensor v = Tensor::arange(1, 5); // [1,2,3,4]
 Tensor w = Tensor::arange(5, 9); // [5,6,7,8]
 Tensor dp = dot(v, w);               // 1*5+2*6+3*7+4*8 = 70
@@ -261,10 +261,195 @@ dp.print();
     M3.print();
 ```
 Resultados:
-```cpp
+```c++
 [70]
 [-0.0345116, -1.46236, 0.435877, -0.431674, 0.245255, -0.104995, -0.580882, -0.0983935, 0.30619, -0.284899, 0.446759, -0
 .486285, -0.409464, -0.895415, 0.432224]
 ```
 Estas funciones son importantes para la implementación de redes neuronales que haremos a continuación.
+
+## 10. Redes Neuronales
+
+## 10. Red Neuronal
+
+Utilizando toda la funcionalidad de la librería Tensor++, se construyó una red neuronal de dos capas para procesamiento de datos.
+
+### 10.1 Arquitectura de la red
+
+| Capa | Operación | Dimensión de entrada | Dimensión de salida |
+|------|-----------|---------------------|---------------------|
+| Entrada | Datos  | - | 1000 × 20 × 20 |
+| Flatten | `view()` | 1000 × 20 × 20 | 1000 × 400 |
+| Capa lineal 1 | `matmul()` + bias | 1000 × 400 | 1000 × 100 |
+| Activación 1 | `ReLU()` | 1000 × 100 | 1000 × 100 |
+| Capa lineal 2 | `matmul()` + bias | 1000 × 100 | 1000 × 10 |
+| Activación 2 | `Sigmoid()` | 1000 × 10 | 1000 × 10 |
+
+### 10.2 Implementación
+
+```c++
+// 1. Entrada (1000 muestras de 20×20)
+Tensor X = Tensor::random({1000, 20, 20}, 0.0, 1.0);
+
+// 2. Aplanar
+Tensor X_flat = X.view({1000, 400});
+
+// 3. Primera capa lineal
+Tensor W1 = Tensor::random({400, 100}, -0.1, 0.1);
+Tensor b1 = Tensor::random({1, 100}, -0.1, 0.1);
+Tensor Z1 = matmul(X_flat, W1);
+Tensor A1 = Z1 + b1;
+
+// 4. Activación ReLU
+ReLU relu;
+Tensor H1 = A1.apply(relu);
+
+// 5. Segunda capa lineal
+Tensor W2 = Tensor::random({100, 10}, -0.1, 0.1);
+Tensor b2 = Tensor::random({1, 10}, -0.1, 0.1);
+Tensor Z2 = matmul(H1, W2);
+Tensor A2 = Z2 + b2;
+
+// 6. Activación Sigmoid (salida final)
+Sigmoid sigmoid;
+Tensor Y = A2.apply(sigmoid);
+```
+
+### Red Neuronal implementada y su ejecución:
+
+```c++
+int main(){
+cout << "     RED NEURONAL CON TENSOR++          " << endl;
+try {
+// ===== PASO 1: Entrada =====
+cout << "\n[Paso 1] Creando tensor de entrada..." << endl;
+Tensor X = Tensor::random({1000, 20, 20}, 0.0, 1.0);
+print_shape(X, "X");
+
+        // ===== PASO 2: View =====
+        cout << "\n[Paso 2] Aplanando..." << endl;
+        Tensor X_flat = X.view({1000, 400});
+        print_shape(X_flat, "X_flat");
+
+        // ===== PASO 3: Primera multiplicación =====
+        cout << "\n[Paso 3] Primera capa lineal..." << endl;
+        Tensor W1 = Tensor::random({400, 100}, -0.1, 0.1);
+        print_shape(W1, "W1");
+
+        Tensor Z1 = matmul(X_flat, W1);
+        print_shape(Z1, "Z1 = X_flat × W1");
+
+        // ===== PASO 4: Sumar bias =====
+        cout << "\n[Paso 4] Sumando bias..." << endl;
+        Tensor b1 = Tensor::random({1, 100}, -0.1, 0.1);
+        print_shape(b1, "b1");
+
+        Tensor A1 = Z1 + b1;
+        print_shape(A1, "A1 = Z1 + b1");
+
+        // ===== PASO 5: ReLU =====
+        cout << "\n[Paso 5] Aplicando ReLU..." << endl;
+        ReLU relu;
+        Tensor H1 = A1.apply(relu);
+        print_shape(H1, "H1 = ReLU(A1)");
+
+        // ===== PASO 6: Segunda multiplicación =====
+        cout << "\n[Paso 6] Segunda capa lineal..." << endl;
+        Tensor W2 = Tensor::random({100, 10}, -0.1, 0.1);
+        print_shape(W2, "W2");
+
+        Tensor Z2 = matmul(H1, W2);
+        print_shape(Z2, "Z2 = H1 × W2");
+
+        // ===== PASO 7: Sumar bias =====
+        cout << "\n[Paso 7] Sumando bias..." << endl;
+        Tensor b2 = Tensor::random({1, 10}, -0.1, 0.1);
+        print_shape(b2, "b2");
+
+        Tensor A2 = Z2 + b2;
+        print_shape(A2, "A2 = Z2 + b2");
+
+        // ===== PASO 8: Sigmoid =====
+        cout << "\n[Paso 8] Aplicando Sigmoid..." << endl;
+        Sigmoid sigmoid;
+        Tensor Y = A2.apply(sigmoid);
+        print_shape(Y, "Y = Sigmoid(A2)");
+
+        // ===== RESULTADO FINAL =====
+        cout << "    ¡RED NEURONAL COMPLETADA CON EXITO!   " << endl;
+
+        cout << "\nShape final del tensor de salida: [";
+        for (size_t d : Y.getShape()) {
+            cout << d << " ";
+        }
+        cout << "]" << endl;
+        cout << "Total de parametros entrenables: "
+                  << 400*100 + 100 + 100*10 + 10 << endl;
+        cout << "  - W1: " << 400*100 << endl;
+        cout << "  - b1: " << 100 << endl;
+        cout << "  - W2: " << 100*10 << endl;
+        cout << "  - b2: " << 10 << endl;
+
+    } catch (const exception& e) {
+        cerr << "\nError: " << e.what() << endl;
+        return 1;
+    }
+    return 0;
+}
+```
+
+## Resultados esperados:
+```c++
+Shape de entrada: [1000 20 20]
+Shape después de view: [1000 400]
+Shape después de primera capa: [1000 100]
+Shape después de ReLU: [1000 100]
+Shape después de segunda capa: [1000 10]
+Shape de salida final: [1000 10]
+```
+
+
+## Resultados respectivos:
+```c++
+     RED NEURONAL CON TENSOR++
+
+[Paso 1] Creando tensor de entrada...
+X shape: [1000 20 20 ]
+
+[Paso 2] Aplanando...
+X_flat shape: [1000 400 ]
+
+[Paso 3] Primera capa lineal...
+W1 shape: [400 100 ]
+Z1 = X_flat ├ù W1 shape: [1000 100 ]
+
+[Paso 4] Sumando bias...
+b1 shape: [1 100 ]
+A1 = Z1 + b1 shape: [1000 100 ]
+
+[Paso 5] Aplicando ReLU...
+H1 = ReLU(A1) shape: [1000 100 ]
+
+[Paso 6] Segunda capa lineal...
+W2 shape: [100 10 ]
+Z2 = H1 ├ù W2 shape: [1000 10 ]
+
+[Paso 7] Sumando bias...
+b2 shape: [1 10 ]
+A2 = Z2 + b2 shape: [1000 10 ]
+
+[Paso 8] Aplicando Sigmoid...
+Y = Sigmoid(A2) shape: [1000 10 ]
+┬íRED NEURONAL COMPLETADA CON EXITO!
+
+Shape final del tensor de salida: [1000 10 ]
+Total de parametros entrenables: 41110
+- W1: 40000
+- b1: 100
+- W2: 1000
+- b2: 10
+```
+
+Notamos que concuerda con lo planteado anteriormente, de esta manera se implementaría con éxito Tensor++.
+
 
