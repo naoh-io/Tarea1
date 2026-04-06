@@ -170,6 +170,48 @@ void Tensor::print() const {
     cout << "]" << endl;
 }
 
+//Sobrecarga--------------------
+Tensor Tensor::operator+(const Tensor& other) const {
+    if (shape != other.shape) {
+        throw runtime_error("las dimensiones son incompatibles para realizar la suma");
+    }
+    vector<double> result_values(total_size);
+    for (size_t i = 0; i < total_size; i++) {
+        result_values[i] = data[i] + other.data[i];
+    }
+    return Tensor(shape, result_values);
+}
+
+Tensor Tensor::operator-(const Tensor& other) const {
+    if (shape != other.shape) {
+        throw runtime_error("las dimensiones son incompatibles para realizar la resta");
+    }
+    vector<double> result_values(total_size);
+    for (size_t i = 0; i < total_size; i++) {
+        result_values[i] = data[i] - other.data[i];
+    }
+    return Tensor(shape, result_values);
+}
+
+Tensor Tensor::operator*(const Tensor& other) const {
+    if (shape != other.shape) {
+        throw runtime_error("las dimensiones son incompatibles para realizar la multiplicación");
+    }
+    vector<double> result_values(total_size);
+    for (size_t i = 0; i < total_size; i++) {
+        result_values[i] = data[i] * other.data[i];
+    }
+    return Tensor(shape, result_values);
+}
+
+Tensor Tensor::operator*(double scalar) const {
+    vector<double> result_values(total_size);
+    for (size_t i = 0; i < total_size; i++) {
+        result_values[i] = data[i] * scalar;
+    }
+    return Tensor(shape, result_values);
+}
+
 int main() {
     Tensor A = Tensor::arange(-5, 5);
     std::cout << "original: ";
