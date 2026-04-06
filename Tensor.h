@@ -25,9 +25,7 @@ private:
     static Tensor arange (double start , double end );
 
     void print() const;
-
-
-}
+};
 
 
 #endif //TAREA1_TENSOR_H

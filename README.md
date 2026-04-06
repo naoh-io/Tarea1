@@ -1,5 +1,5 @@
 # Tarea1
-Programming III ; 2026-1
+Programming III ; 2026-1 
 
 ### Clase Tensor
 Al inicio se creó la clase "Tensor.h" en el cual se definieron los constructores y destructores, así como una versión base de los métodos pero que luego se corrigió.
