@@ -201,7 +201,7 @@ Tensor Tensor::operator+(const Tensor& other) const {
         return Tensor(shape, resultado_values);
         }
 
-    throw std::runtime_error("Dimensiones incompatibles para suma");
+    throw runtime_error("Dimensiones incompatibles para suma ");
 }
 
 Tensor Tensor::operator-(const Tensor& other) const {

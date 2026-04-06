@@ -244,7 +244,7 @@ friend Tensor matmul(const Tensor& a, const Tensor& b);
 ```
 
 ## Validaciones:
-- Ambos tensores deben ser 1D
+- Ambos tensores deben ser 2D
 - Deben tener la misma longitud
 
 ## Ejemplos de ejecución (ambos):
