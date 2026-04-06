@@ -267,6 +267,64 @@ Tensor Tensor::unsqueeze(size_t dim) const {
     return Tensor(new_shape, data, total_size);
 }
 
+// Concatenacion-------------------
+Tensor Tensor::concat(const std::vector<Tensor>& tensor, size_t dim) {
+    if (tensor.empty()) {
+        throw runtime_error("No hay tensores");
+    }
+    const Tensor& first = tensor[0];
+    if (first.shape.size() != 2) {
+        throw runtime_error("concat solo implementado para 2D");
+    }
+    if (dim >= 2) {
+        throw runtime_error("dimensión invalida (0=filas, 1=columnas)");
+    }
+    for (size_t i = 1; i < tensor.size(); i++) {
+        if (dim == 0) {
+            if (tensor[i].shape[1] != first.shape[1]) {
+                throw runtime_error("Número de columnas diferente");
+            }
+        } else {
+            if (tensor[i].shape[0] != first.shape[0]) {
+                throw runtime_error("Número de filas diferente");
+            }
+        }
+    }
+    vector<size_t> new_shape = first.shape;
+    for (size_t i = 1; i < tensor.size(); i++) {
+        new_shape[dim] += tensor[i].shape[dim];
+    }
+    size_t total_size = new_shape[0] * new_shape[1];
+    vector<double> values(total_size);
+    size_t current_pos = 0;
+    for (const auto& t : tensor) {
+        if (dim == 0) {
+            size_t rows = t.shape[0];
+            size_t cols = t.shape[1];
+            for (size_t r = 0; r < rows; r++) {
+                for (size_t c = 0; c < cols; c++) {
+                    size_t src_idx = r * cols + c;
+                    size_t dst_idx = (current_pos + r) * cols + c;
+                    values[dst_idx] = t.data[src_idx];
+                }
+            }
+            current_pos += rows;
+        } else {
+            size_t rows = t.shape[0];
+            size_t cols = t.shape[1];
+            size_t total_cols = new_shape[1];
+            for (size_t r = 0; r < rows; r++) {
+                for (size_t c = 0; c < cols; c++) {
+                    size_t src_idx = r * cols + c;
+                    size_t dst_idx = r * total_cols + current_pos + c;
+                    values[dst_idx] = t.data[src_idx];
+                }
+            }
+            current_pos += cols;
+        }
+    }
+    return Tensor(new_shape, values);
+}
 
 int main() {
     //Tensor A = Tensor::arange(2, 5);
@@ -295,14 +353,22 @@ int main() {
     //E.print();
     //F.print();
     //H.print();
-    Tensor A = Tensor::arange(0, 12);
-    A.print();
-    Tensor B = A.view({3, 4});
-    B.print();
-    Tensor C = A.view({2, 2, 3});
+    //Tensor A = Tensor::arange(0, 12);
+    //A.print();
+    //Tensor B = A.view({3, 4});
+    //B.print();
+    //Tensor C = A.view({2, 2, 3});
+    //C.print();
+    //Tensor D = A.unsqueeze(0);
+    //Tensor E = B.unsqueeze(1);
+    //Tensor F = B.unsqueeze(2);
+    Tensor A = Tensor::ones({2, 3});
+    Tensor B = Tensor::zeros({2, 3});
+    Tensor C = Tensor::concat({A, B}, 0);
+    Tensor D = Tensor::concat({A, B}, 1);
+    Tensor E = Tensor::concat({A, A, B, B}, 0);
     C.print();
-    Tensor D = A.unsqueeze(0);
-    Tensor E = B.unsqueeze(1);
-    Tensor F = B.unsqueeze(2);
+    D.print();
+    E.print();
     return 0;
 }

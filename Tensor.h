@@ -47,6 +47,8 @@ private:
     Tensor unsqueeze(size_t dim) const;
     Tensor(const std::vector<size_t>& shape, double* shared_data, size_t size);
 
+    static Tensor concat(const std::vector<Tensor>& tensors, size_t dim);
+
 
     void print() const;
 };

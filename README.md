@@ -180,5 +180,43 @@ Resultado obtenido:
 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 ```
 
+## 8. Concatenación
+Se implementó el método estático `concat()` para unir múltiples tensores a lo largo de una dimensión específica. El método crea un nuevo tensor con memoria propia (deep copy) y copia los datos de cada tensor en la posición correspondiente dentro del nuevo arreglo contiguo.
 
+
+
+### Método concat
+
+```cpp
+static Tensor concat(const std::vector<Tensor>& tensors, size_t dim);
+```
+
+### Validaciones realizadas:
+
+- Que haya al menos un tensor para concatenar
+- Que la dimensión sea válida (dentro del rango)
+- Que todos los tensores tengan el mismo número de dimensiones
+- Que todas las dimensiones excepto la de concatenación coincidan
+- Que el tensor resultante no exceda 3 dimensiones
+
+### Ejemplos de ejecución:
+
+```cpp
+Tensor A = Tensor::ones({2, 3});
+Tensor B = Tensor::zeros({2, 3});
+Tensor C = Tensor::concat({A, B}, 0);
+Tensor D = Tensor::concat({A, B}, 1);
+Tensor E = Tensor::concat({A, A, B, B}, 0);
+C.print();
+D.print();
+E.print();
+```
+
+### Resultado de ejecución:
+
+```cpp
+[1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+[1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+```
 
