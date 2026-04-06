@@ -270,11 +270,9 @@ Estas funciones son importantes para la implementación de redes neuronales que 
 
 ## 10. Redes Neuronales
 
-## 10. Red Neuronal
-
 Utilizando toda la funcionalidad de la librería Tensor++, se construyó una red neuronal de dos capas para procesamiento de datos.
 
-### 10.1 Arquitectura de la red
+###  Arquitectura de la red
 
 | Capa | Operación | Dimensión de entrada | Dimensión de salida |
 |------|-----------|---------------------|---------------------|
@@ -285,7 +283,7 @@ Utilizando toda la funcionalidad de la librería Tensor++, se construyó una red
 | Capa lineal 2 | `matmul()` + bias | 1000 × 100 | 1000 × 10 |
 | Activación 2 | `Sigmoid()` | 1000 × 10 | 1000 × 10 |
 
-### 10.2 Implementación
+###  Implementación
 
 ```c++
 // 1. Entrada (1000 muestras de 20×20)
