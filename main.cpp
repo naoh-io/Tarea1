@@ -2,6 +2,48 @@
 #include "Tensor.h"
 using namespace std;
 
+class TensorTransform {
+public:
+    virtual Tensor apply(const Tensor& t) const = 0;
+    virtual ~TensorTransform() = default;
+};
+
+class ReLU : public TensorTransform {
+public:
+    Tensor apply(const Tensor& t) const override;
+};
+
+Tensor ReLU::apply(const Tensor& t) const {
+    vector<double> values(t.getTotalSize());
+
+    for (size_t i = 0; i < t.getTotalSize(); i++) {
+        double x = t.getData()[i];
+        values[i] = (x > 0) ? x : 0.0;  // Si x > 0, queda x; sino, 0
+    }
+
+    return Tensor(t.getShape(), values);
+}
+
+Tensor Tensor::apply(const TensorTransform& transform) const {
+    return transform.apply(*this);
+}
+
+class Sigmoid : public TensorTransform {
+public:
+    Tensor apply(const Tensor& t) const override;
+};
+
+Tensor Sigmoid::apply(const Tensor& t) const {
+    vector<double> values(t.getTotalSize());
+
+    for (size_t i = 0; i < t.getTotalSize(); i++) {
+        double x = t.getData()[i];
+        values[i] = 1.0 / (1.0 + exp(-x));
+    }
+
+    return Tensor(t.getShape(), values);
+}
+
 Tensor::Tensor(const std::vector<size_t>& shape, const std::vector<double>&values) : shape(shape) {
     total_size = 1;
     for (size_t dim : shape) {
