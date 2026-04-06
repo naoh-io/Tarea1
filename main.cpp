@@ -128,14 +128,18 @@ void Tensor::print() const { //pero solo sirve para 1D
 }
 
 int main() {
-    Tensor a = Tensor::arange(0, 6);
-    Tensor b = a;
-    Tensor c = std::move(a);
-
-    Tensor d = Tensor::zeros({2, 3});
-    d = b;
-
-    Tensor e = Tensor::ones({2, 2});
-    e = move(d);
+    Tensor A = Tensor::arange(-5, 5);
+    std::cout << "original: ";
+    A.print();
+    ReLU relu;
+    Tensor B = A.apply(relu);
+    std::cout << "después de ReLU: ";
+    B.print();
+    Sigmoid sigmoid;
+    Tensor C = A.apply(sigmoid);
+    std::cout << "después de Sigmoid: ";
+    C.print();
+    ReLU relu2;
+    Tensor D = A.apply(relu2).apply(sigmoid);
     return 0;
 }
