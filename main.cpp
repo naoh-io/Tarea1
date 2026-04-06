@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Tensor.h"
 using namespace std;
 
 Tensor::Tensor(const std::vector<size_t>& shape, const std::vector<double>&values) : shape(shape) {
@@ -25,6 +26,6 @@ Tensor::~Tensor() {
 
 
 int main(){
-    cout << "hola mundo";
+
     return 0;
 }
