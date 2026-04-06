@@ -19,6 +19,12 @@ private:
 
     ~Tensor();
 
+    Tensor(const Tensor& other);
+    Tensor& operator=(const Tensor& other);
+
+    Tensor(Tensor&& other) noexcept;
+    Tensor& operator=(Tensor&& other) noexcept;
+
     static Tensor zeros(const std::vector<size_t>& shape);
     static Tensor ones(const std::vector<size_t>& shape);
     static Tensor random(const std::vector<size_t>& shape, double min, double max);
