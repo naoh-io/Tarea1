@@ -51,5 +51,6 @@ Se implementaron los 5 métodos especiales:
 
 Estos métodos garantizan que no haya fugas de memoria, dobles liberaciones, y permiten operaciones eficientes sin copias innecesarias.
 
+### 5. Polimorfismo y transformaciones
 
 

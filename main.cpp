@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Tensor.h"
+#include <cmath>
 using namespace std;
 
 class TensorTransform {
@@ -51,7 +52,7 @@ Tensor::Tensor(const std::vector<size_t>& shape, const std::vector<double>&value
     }
 
     if (values.size() != total_size) {
-        cout << "El número de valores no coincide con la forma del tensor" << endl;
+        cout << "La cantidad de valores no coincide con la forma del tensor" << endl;
     }
 
     data = new double[total_size];
@@ -160,7 +161,7 @@ Tensor Tensor::arange(double start, double end) {
     return Tensor({size}, values);
 }
 
-void Tensor::print() const { //pero solo sirve para 1D
+void Tensor::print() const {
     cout << "[";
     for (size_t i = 0; i < total_size; i++) {
         cout << data[i];
@@ -175,11 +176,11 @@ int main() {
     A.print();
     ReLU relu;
     Tensor B = A.apply(relu);
-    std::cout << "después de ReLU: ";
+    std::cout << "despues de ReLU: ";
     B.print();
     Sigmoid sigmoid;
     Tensor C = A.apply(sigmoid);
-    std::cout << "después de Sigmoid: ";
+    std::cout << "despues de Sigmoid: ";
     C.print();
     ReLU relu2;
     Tensor D = A.apply(relu2).apply(sigmoid);
