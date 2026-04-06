@@ -213,8 +213,25 @@ Tensor Tensor::operator*(double scalar) const {
 }
 
 int main() {
-    Tensor A = Tensor::arange(-5, 5);
-    std::cout << "original: ";
+    Tensor A = Tensor::arange(2, 5);
+    //std::cout << "original: ";
+    //A.print();
+    //ReLU relu;
+    //Tensor B = A.apply(relu);
+    //std::cout << "despues de ReLU: ";
+    //B.print();
+    //Sigmoid sigmoid;
+    //Tensor C = A.apply(sigmoid);
+    //std::cout << "despues de Sigmoid: ";
+    //C.print();
+    //ReLU relu2;
+    //Tensor D = A.apply(relu2).apply(sigmoid);
+    Tensor B = Tensor::ones({3});
+    Tensor C = A + B;
+    Tensor D = A - B;
+    Tensor E = A * B;
+    Tensor F = A * 2.0;
+    Tensor H = (A + B) * 2.0;
     A.print();
     ReLU relu;
     Tensor B = A.apply(relu);
